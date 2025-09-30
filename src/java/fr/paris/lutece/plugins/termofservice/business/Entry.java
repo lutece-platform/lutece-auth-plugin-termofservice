@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.termofservice.business;
 
-import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotEmpty;
 import java.io.Serializable;
 /**
@@ -45,6 +44,9 @@ public class Entry implements Serializable
 
     // Variables declarations 
     private int _nId;
+    
+    @NotEmpty ( message = "#i18n{termofservice.validation.entry.Title.notEmpty}" )
+    private String _strTitle;
     
     @NotEmpty( message = "#i18n{termofservice.validation.entry.Text.notEmpty}" )
     private String _strText;
@@ -88,6 +90,22 @@ public class Entry implements Serializable
     }
     
     
+    /**
+     * @return the _strTitle
+     */
+    public String getTitle( )
+    {
+        return _strTitle;
+    }
+
+    /**
+     * @param strTitle the _strTitle to set
+     */
+    public void setTitle( String strTitle )
+    {
+        this._strTitle = strTitle;
+    }
+
     /**
      * Returns the Version
      * @return The Version

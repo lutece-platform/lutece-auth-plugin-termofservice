@@ -13,7 +13,7 @@
     <div class="clearfix"></div>
     <@table>
         <tr>
-            <th>#i18n{termofservice.manage_entrys.columnText}</th>
+            <th>#i18n{termofservice.manage_entrys.columnTitle}</th>
             <th>#i18n{termofservice.manage_entrys.columnVersion}</th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
@@ -21,7 +21,7 @@
         <#list entry_list as entry >
         <tr>
             <td>
-				${entry.text}
+				${entry.title}
 			</td>
 			<td>
 				${entry.version}
