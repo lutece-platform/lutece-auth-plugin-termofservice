@@ -11,11 +11,14 @@
 			<@input type="hidden" id="id" name="id" value="${entry.id}"/>
 			<@input type="hidden" value="${token}" name="token" />
 			
+			<@formGroup labelFor='title' labelKey='#i18n{termofservice.modify_entry.labelTitle}' mandatory=true>
+				<@input type='text' id='title' name='title'  value='${entry.title!\'\'}' tabIndex='0' />
+			</@formGroup>
 			<@formGroup labelFor='text' labelKey='#i18n{termofservice.modify_entry.labelText}' mandatory=true>
-				<@input type='textarea' id='text' name='text'  value='${entry.text!\'\'}' richtext=true tabIndex='0' />
+				<@input type='textarea' id='text' name='text'  value='${entry.text!\'\'}' richtext=true tabIndex='1' />
 			</@formGroup>
 			<@formGroup labelFor='version' labelKey='#i18n{termofservice.modify_entry.labelVersion}' mandatory=true>
-				<@input type='text' id='version' name='version'  value='${entry.version!\'\'}' tabIndex='1' />
+				<@input type='text' id='version' name='version'  value='${entry.version!\'\'}' tabIndex='2' />
 			</@formGroup>
         <@actionButtons button1Name="action_modifyEntry" button2Name="view_manageEntry"/>
     </@tform>
