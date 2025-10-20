@@ -177,7 +177,17 @@ public final class UserAcceptedHome
     	
     }
     
-    
+    /**
+     * Returns an instance of a userAccepted whose identifier is specified in parameter
+     * @param strGuid The user GUID
+     * @param nIdEntry The id entry
+     * @param nVersion The version
+     * @return an instance of UserAccepted
+     */
+    public static Optional<UserAccepted> findByGuidAndEntryAndVersion( String strGuid, int nIdEntry, int nVersion )
+    {        
+        return _dao.loadByGuidAndIdEntryAndVersion( strGuid, nIdEntry, nVersion, _plugin );        
+    }
   
     
     /**

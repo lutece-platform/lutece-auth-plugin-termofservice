@@ -83,6 +83,16 @@ public interface IUserAcceptedDAO
      * @return The instance of the userAccepted
      */
     Optional<UserAccepted> loadByGuid( String strGuid, Plugin plugin );
+    
+    /**
+     * Load the data from the table
+     * @param strGuid The guid
+     * @param nIdEntry The id entry
+     * @param nVersion The version of entry
+     * @param plugin the Plugin
+     * @return The instance of the userAccepted
+     */
+    Optional<UserAccepted> loadByGuidAndIdEntryAndVersion( String strGuid, int nIdEntry, int nVersion, Plugin plugin );
 
     /**
      * Load the data of all the userAccepted objects and returns them as a list

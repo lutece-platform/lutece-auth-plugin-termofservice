@@ -49,6 +49,7 @@ import fr.paris.lutece.plugins.termofservice.business.EntryHome;
 import fr.paris.lutece.plugins.termofservice.business.UserAccepted;
 import fr.paris.lutece.plugins.termofservice.business.UserAcceptedHome;
 import fr.paris.lutece.plugins.termofservice.rs.Constants;
+import fr.paris.lutece.plugins.termofservice.service.TOSService;
 import fr.paris.lutece.plugins.verifybackurl.service.AuthorizedUrlService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.security.LuteceUser;
@@ -79,11 +80,13 @@ public class EntryXPage extends MVCApplication
     // Parameters
     private static final String PARAMETER_ID_ENTRY = "id";
     private static final String PARAMETER_ID_ACCEPTED = "accepted";
+    private static final String PARAMETER_MODE_TOS = "mode";
     
     // Markers
     private static final String MARK_ENTRY_LIST = "entry_list";
     private static final String MARK_ENTRY = "entry";
     private static final String MARK_BACK_URL = "back_url";
+    private static final String MARK_MODE = "mode";
     
     // Views
     private static final String VIEW_MANAGE_TOS = "manageEntrys";
@@ -109,17 +112,17 @@ public class EntryXPage extends MVCApplication
     public XPage getManageTOS( HttpServletRequest request ) throws UserNotSignedException
     {
     	
-    	
+    	String strMode = request.getParameter( PARAMETER_MODE_TOS );
     	 
         _entry = ( _entry != null ) ? _entry : new Entry(  );
         List<Entry> listEntrys = EntryHome.getEntrysList(  );
-        Optional<Entry> entryLastVersion = EntryHome.findByLastVersion( );
+        Optional<Entry> currentEntry = TOSService.getCurrentEntry( );
         
         Map<String, Object> model = getModel(  );
         model.put( MARK_ENTRY_LIST, listEntrys );
-        if ( entryLastVersion.isPresent( ) )
+        if ( currentEntry.isPresent( ) )
         {
-        	model.put( MARK_ENTRY, entryLastVersion.get( ) );
+        	model.put( MARK_ENTRY, currentEntry.get( ) );
         }
         else
         {
@@ -127,35 +130,39 @@ public class EntryXPage extends MVCApplication
         }
         
         
-        //check back url
-        String strBackUrl = AuthorizedUrlService.getInstance().getServiceBackUrl(request );
-        
-        if ( !StringUtils.isEmpty( strBackUrl ) )
+        if( !"see".equals( strMode ))
         {
-            model.put ( MARK_BACK_URL, AuthorizedUrlService.getInstance().getServiceBackUrlEncoded(request) );
-        
+            //check back url
+            String strBackUrl = AuthorizedUrlService.getInstance().getServiceBackUrl(request );
+            
+            if ( !StringUtils.isEmpty( strBackUrl ) )
+            {
+                model.put ( MARK_BACK_URL, AuthorizedUrlService.getInstance().getServiceBackUrlEncoded(request) );
+            
+            }
+            model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_TOS ) );
+            
+    
+            LuteceUser luteceUser = SecurityService.getInstance( ).getRegisteredUser( request );
+            if ( luteceUser == null)
+            {
+            	throw new UserNotSignedException( );
+            }
+            
+            Optional<UserAccepted> userAccept = TOSService.getUserAcceptedTOS( luteceUser.getName( ) );
+    		if (userAccept.isPresent( ) )
+    		{
+    			  
+    	        if ( !StringUtils.isEmpty( strBackUrl ) )
+    	        {
+    	            return redirect(request, strBackUrl);
+    	        }
+    			
+        	   return redirect(request, AppPathService.getBaseUrl(request));
+    		}
         }
-        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_TOS ) );
         
-
-        LuteceUser luteceUser = SecurityService.getInstance( ).getRegisteredUser( request );
-        if ( luteceUser == null)
-        {
-        	throw new UserNotSignedException( );
-        }
-        
-        Optional<UserAccepted> userAccept = UserAcceptedHome.findByGuid( luteceUser.getName( ),AppPropertiesService.getPropertyBoolean(Constants.PROPERTY_USED_REMOTE, false) );
-		if (userAccept.isPresent( ) )
-		{
-			  
-	        if ( !StringUtils.isEmpty( strBackUrl ) )
-	        {
-	            return redirect(request, strBackUrl);
-	        }
-			
-    	   return redirect(request, AppPathService.getBaseUrl(request));
-		}
-
+        model.put( MARK_MODE, strMode );
         
         return getXPage( TEMPLATE_MANAGE_TOS, getLocale( request ), model );
     }

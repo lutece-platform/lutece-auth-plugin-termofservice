@@ -92,7 +92,24 @@ public final class EntryHome
     {
         _dao.delete( nKey, _plugin );
     }
-
+    
+    /**
+     * Publish the entry whose identifier is specified in parameter
+     * @param nKey The identifier of the Entry to publish
+     */
+    public static void publishEntry( int nKey )
+    {
+        _dao.publish( nKey, _plugin );
+    }
+    
+    /**
+     * Unpublish all entries
+     */
+    public static void unpublishAllEntries ( )
+    {
+        _dao.unpublishAll( _plugin );
+    }
+   
     /**
      * Returns an instance of a entry whose identifier is specified in parameter
      * @param nKey The entry primary key
@@ -111,6 +128,15 @@ public final class EntryHome
     public static Optional<Entry> findByLastVersion( )
     {
         return _dao.loadLastVersion( _plugin );
+    }
+    
+    /**
+     * Returns an instance of a published entry
+     * @return an instance of published Entry
+     */
+    public static Optional<Entry> findPublishedEntry( )
+    {
+        return _dao.loadPublishedEntry( _plugin );
     }
 
     /**

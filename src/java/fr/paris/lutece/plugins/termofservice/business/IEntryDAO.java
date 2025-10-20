@@ -65,6 +65,19 @@ public interface IEntryDAO
      */
     void delete( int nKey, Plugin plugin );
 
+    /**
+     * Publish an entry
+     * @param nKey The identifier of the Entry to publish
+     * @param plugin the Plugin
+     */
+    void publish( int nKey, Plugin plugin );
+    
+    /**
+     * Unpublish all entries
+     * @param plugin the Plugin
+     */
+    void unpublishAll( Plugin plugin );
+
     ///////////////////////////////////////////////////////////////////////////
     // Finders
 
@@ -112,4 +125,13 @@ public interface IEntryDAO
      * @return The instance of the entry
      */
 	Optional<Entry> loadLastVersion(Plugin _plugin);
+	
+	
+	/**
+     * Load the published entry
+     * @param plugin the Plugin
+     * @return The instance of the published entry
+     */
+    Optional<Entry> loadPublishedEntry(Plugin plugin);
+	
 }

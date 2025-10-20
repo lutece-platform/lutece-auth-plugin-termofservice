@@ -50,15 +50,18 @@ import java.util.Optional;
 public final class EntryDAO implements IEntryDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_entry, title, text, version FROM termofservice_entry WHERE id_entry = ?";
-    private static final String SQL_QUERY_SELECT_LAST_VERSION = "SELECT id_entry, title, text, version FROM termofservice_entry WHERE version = (select max( version ) from termofservice_entry ) ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO termofservice_entry ( title, text, version ) VALUES ( ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE id_entry = ?";
+    private static final String SQL_QUERY_SELECT_LAST_VERSION = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE version = (select max( version ) from termofservice_entry ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO termofservice_entry ( title, text, version, published ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM termofservice_entry WHERE id_entry = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE termofservice_entry SET id_entry = ?, title = ?  , text = ?, version = ? WHERE id_entry = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_entry, title, text, version FROM termofservice_entry";
+    private static final String SQL_QUERY_UPDATE = "UPDATE termofservice_entry SET id_entry = ?, title = ? , text = ?, version = ?, published = ? WHERE id_entry = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_entry, title, text, version, published FROM termofservice_entry";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_entry FROM termofservice_entry";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_entry, title, text, version FROM termofservice_entry WHERE id_entry IN (  ";
-
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE id_entry IN (  ";
+    private static final String SQL_QUERY_PUBLISH = "UPDATE termofservice_entry SET published = 1 WHERE id_entry = ?";
+    private static final String SQL_QUERY_UNPUBLISH_ALL = "UPDATE termofservice_entry SET published = 0";
+    private static final String SQL_QUERY_SELECT_PUBLISHED = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE published = 1 ";
+    
     /**
      * {@inheritDoc }
      */
@@ -71,6 +74,7 @@ public final class EntryDAO implements IEntryDAO
             daoUtil.setString( nIndex++ , entry.getTitle( ) );
             daoUtil.setString( nIndex++ , entry.getText( ) );
             daoUtil.setInt( nIndex++ , entry.getVersion( ) );
+            daoUtil.setBoolean( nIndex++ , entry.isPublished( ) );
             
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) ) 
@@ -101,7 +105,8 @@ public final class EntryDAO implements IEntryDAO
 	            entry.setId( daoUtil.getInt( nIndex++ ) );
 	            entry.setTitle( daoUtil.getString( nIndex++ ) );
 			    entry.setText( daoUtil.getString( nIndex++ ) );
-			    entry.setVersion( daoUtil.getInt( nIndex ) );
+			    entry.setVersion( daoUtil.getInt( nIndex++ ) );
+			    entry.setPublished( daoUtil.getBoolean( nIndex ) );
 	        }
 	
 	        return Optional.ofNullable( entry );
@@ -135,6 +140,7 @@ public final class EntryDAO implements IEntryDAO
 	        daoUtil.setString( nIndex++ , entry.getTitle( ) );
             daoUtil.setString( nIndex++ , entry.getText( ) );
             daoUtil.setInt( nIndex++ , entry.getVersion( ) );
+            daoUtil.setBoolean( nIndex++ , entry.isPublished( ) );
 	        daoUtil.setInt( nIndex , entry.getId( ) );
 	
 	        daoUtil.executeUpdate( );
@@ -160,7 +166,8 @@ public final class EntryDAO implements IEntryDAO
 	            entry.setId( daoUtil.getInt( nIndex++ ) );
 	            entry.setTitle( daoUtil.getString( nIndex++ ) );
 			    entry.setText( daoUtil.getString( nIndex++ ) );
-			    entry.setVersion( daoUtil.getInt( nIndex ) );
+			    entry.setVersion( daoUtil.getInt( nIndex++ ) );
+			    entry.setPublished( daoUtil.getBoolean( nIndex ) );
 	
 	            entryList.add( entry );
 	        }
@@ -244,7 +251,8 @@ public final class EntryDAO implements IEntryDAO
 		            entry.setId( daoUtil.getInt( nIndex++ ) );
 		            entry.setTitle( daoUtil.getString( nIndex++ ) );
 				    entry.setText( daoUtil.getString( nIndex++ ) );
-				    entry.setVersion( daoUtil.getInt( nIndex ) );
+				    entry.setVersion( daoUtil.getInt( nIndex++ ) );
+				    entry.setPublished( daoUtil.getBoolean( nIndex ) );
 		            
 		            entryList.add( entry );
 		        }
@@ -272,10 +280,55 @@ public final class EntryDAO implements IEntryDAO
 	            entry.setId( daoUtil.getInt( nIndex++ ) );
 	            entry.setTitle( daoUtil.getString( nIndex++ ) );
 			    entry.setText( daoUtil.getString( nIndex++ ) );
-			    entry.setVersion( daoUtil.getInt( nIndex ) );
+			    entry.setVersion( daoUtil.getInt( nIndex++ ) );
+			    entry.setPublished( daoUtil.getBoolean( nIndex ) );
 	        }
 	
 	        return Optional.ofNullable( entry );
         }
 	}
+
+    @Override
+    public void publish( int nKey, Plugin plugin )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_PUBLISH, plugin ) )
+        {
+            daoUtil.setInt( 1, nKey );
+            
+            daoUtil.executeUpdate( );
+        }        
+    }
+
+    @Override
+    public void unpublishAll( Plugin plugin )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UNPUBLISH_ALL, plugin ) )
+        {            
+            daoUtil.executeUpdate( );
+        } 
+    }
+
+    @Override
+    public Optional<Entry> loadPublishedEntry( Plugin plugin )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_PUBLISHED, plugin ) )
+        {
+            daoUtil.executeQuery( );
+            Entry entry = null;
+    
+            if ( daoUtil.next( ) )
+            {
+                entry = new Entry();
+                int nIndex = 1;
+                
+                entry.setId( daoUtil.getInt( nIndex++ ) );
+                entry.setTitle( daoUtil.getString( nIndex++ ) );
+                entry.setText( daoUtil.getString( nIndex++ ) );
+                entry.setVersion( daoUtil.getInt( nIndex++ ) );
+                entry.setPublished( daoUtil.getBoolean( nIndex ) );
+            }
+    
+            return Optional.ofNullable( entry );
+        }
+    }
 }

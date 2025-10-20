@@ -52,6 +52,8 @@ public class Entry implements Serializable
     private String _strText;
     
     private int _nVersion;
+    
+    private boolean _bPublished;
 
     /**
      * Returns the Id
@@ -123,5 +125,20 @@ public class Entry implements Serializable
     {
         _nVersion = nVersion;
     }
-    
+
+    /**
+     * @return the _bPublished
+     */
+    public boolean isPublished( )
+    {
+        return _bPublished;
+    }
+
+    /**
+     * @param bPublished the _bPublished to set
+     */
+    public void setPublished( boolean bPublished )
+    {
+        this._bPublished = bPublished;
+    }
 }
