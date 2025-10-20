@@ -58,6 +58,7 @@ public final class UserAcceptedDAO implements IUserAcceptedDAO
     private static final String SQL_QUERY_SELECTALL = "SELECT id_user_accepted, guid, fk_id_entry, date_accepted, version FROM termofservice_user_accepted";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_user_accepted FROM termofservice_user_accepted";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_user_accepted, guid, fk_id_entry, date_accepted, version FROM termofservice_user_accepted WHERE id_user_accepted IN (  ";
+    private static final String SQL_QUERY_SELECT_BY_GUID_ENTRY_VERSION = "SELECT id_user_accepted, guid, fk_id_entry, date_accepted, version FROM termofservice_user_accepted WHERE guid = ? AND fk_id_entry = ? AND version = ? ";
 
     /**
      * {@inheritDoc }
@@ -285,4 +286,33 @@ public final class UserAcceptedDAO implements IUserAcceptedDAO
 	        return Optional.ofNullable( userAccepted );
         }
 	}
+
+    @Override
+    public Optional<UserAccepted> loadByGuidAndIdEntryAndVersion( String strGuid, int nIdEntry, int nVersion, Plugin plugin )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_GUID_ENTRY_VERSION, plugin  ) )
+        {
+            daoUtil.setString( 1, strGuid );
+            daoUtil.setInt( 2, nIdEntry );
+            daoUtil.setInt( 3, nVersion );
+            
+            daoUtil.executeQuery( );
+            
+            UserAccepted userAccepted = null;
+            
+            if ( daoUtil.next( ) )
+            {
+                userAccepted = new UserAccepted();
+                int nIndex = 1;
+                
+                userAccepted.setId( daoUtil.getInt( nIndex++ ) );
+                userAccepted.setGuid( daoUtil.getString( nIndex++ ) );
+                userAccepted.setFkIdEntry( daoUtil.getInt( nIndex++ ) );
+                userAccepted.setDateAccepted( daoUtil.getDate( nIndex++ ) );
+                userAccepted.setVersion( daoUtil.getInt( nIndex ) );
+            }
+            
+            return Optional.ofNullable( userAccepted );
+        }
+    }
 }

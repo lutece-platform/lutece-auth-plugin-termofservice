@@ -53,8 +53,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.termofservice.business.Entry;
 import fr.paris.lutece.plugins.termofservice.business.EntryHome;
+import fr.paris.lutece.plugins.termofservice.util.TOSConstants;
 
 /**
  * This class provides the user interface to manage Entry features ( manage, create, modify, remove )
@@ -78,6 +82,7 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     // Markers
     private static final String MARK_ENTRY_LIST = "entry_list";
     private static final String MARK_ENTRY = "entry";
+    private static final String MARK_FEATURE_TOS_PUBLICATION = "featureTOSPublication";
 
     private static final String JSP_MANAGE_ENTRYS = "jsp/admin/plugins/termofservice/ManageEntrys.jsp";
 
@@ -97,11 +102,14 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     private static final String ACTION_MODIFY_ENTRY = "modifyEntry";
     private static final String ACTION_REMOVE_ENTRY = "removeEntry";
     private static final String ACTION_CONFIRM_REMOVE_ENTRY = "confirmRemoveEntry";
+    private static final String ACTION_PUBLISH_ENTRY = "publishEntry";
 
     // Infos
     private static final String INFO_ENTRY_CREATED = "termofservice.info.entry.created";
     private static final String INFO_ENTRY_UPDATED = "termofservice.info.entry.updated";
     private static final String INFO_ENTRY_REMOVED = "termofservice.info.entry.removed";
+    private static final String INFO_ENTRY_PUBLISHED = "termofservice.info.entry.published";
+
     
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
@@ -126,6 +134,7 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
         }
         
         Map<String, Object> model = getPaginatedListModel( request, MARK_ENTRY_LIST, _listIdEntrys, JSP_MANAGE_ENTRYS );
+        model.put( MARK_FEATURE_TOS_PUBLICATION, TOSConstants.PROPERTY_FEATURE_TOS_PUBLICATION_ENABLED );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_ENTRYS, TEMPLATE_MANAGE_ENTRYS, model );
     }
@@ -294,6 +303,26 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
         addInfo( INFO_ENTRY_UPDATED, getLocale(  ) );
         resetListId( );
 
+        return redirectView( request, VIEW_MANAGE_ENTRYS );
+    }
+    
+    
+    @Action( ACTION_PUBLISH_ENTRY )
+    public String doPublishEntry( HttpServletRequest request )
+    {
+        if( TOSConstants.PROPERTY_FEATURE_TOS_PUBLICATION_ENABLED )
+        {
+            String strIdEntry = request.getParameter( PARAMETER_ID_ENTRY );
+            
+            if( StringUtils.isNumeric( strIdEntry ) )
+            {
+                EntryHome.unpublishAllEntries( );
+                EntryHome.publishEntry( Integer.parseInt( strIdEntry ) );
+            }
+            
+            addInfo( INFO_ENTRY_PUBLISHED, getLocale(  ) );
+            resetListId( );
+        }
         return redirectView( request, VIEW_MANAGE_ENTRYS );
     }
 }

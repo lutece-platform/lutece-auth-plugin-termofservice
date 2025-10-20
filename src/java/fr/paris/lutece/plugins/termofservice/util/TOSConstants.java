@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2022, City of Paris
+ * Copyright (c) 2002-2025, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,29 +31,26 @@
  *
  * License 1.0
  */
-package fr.paris.lutece.plugins.termofservice.web;
+package fr.paris.lutece.plugins.termofservice.util;
 
-import java.util.function.BiPredicate;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
-import fr.paris.lutece.plugins.automaticroleprovider.service.AutomaticRoleConfiguration;
-import fr.paris.lutece.plugins.automaticroleprovider.service.ConfigurationPredicate;
-import fr.paris.lutece.plugins.termofservice.service.TOSService;
-import fr.paris.lutece.portal.service.security.LuteceUser;
+/**
+ * 
+ * TOSConstants
+ *
+ */
+public class TOSConstants
+{
+    /**
+     * Private constructor
+     */
+    private TOSConstants ()
+    {
+        //Do nothing
+    }
 
-public class TOSPredicate implements ConfigurationPredicate{
-
-	BiPredicate<LuteceUser,AutomaticRoleConfiguration>  _biPredicate;
-	
-	public TOSPredicate() {
-		 
-		_biPredicate = (aUser, roleConfiguration) -> TOSService.getUserAcceptedTOS( aUser.getName( ) ).isPresent( );
-
-	}
-
-	@Override
-	public BiPredicate<LuteceUser, AutomaticRoleConfiguration> getPredicate() {
-
-		return _biPredicate;
-	}
+    //Properties
+    public static final boolean PROPERTY_FEATURE_TOS_PUBLICATION_ENABLED = AppPropertiesService.getPropertyBoolean( "termofservice.feature.tos.publication.enabled", true );
 
 }
