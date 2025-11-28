@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset termofservice:init_core_termofservice.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 
 --
 -- Data for table core_admin_right

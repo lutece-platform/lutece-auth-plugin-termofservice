@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset termofservice:create_db_termofservice.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 
 --
 -- Structure for table termofservice_entry
