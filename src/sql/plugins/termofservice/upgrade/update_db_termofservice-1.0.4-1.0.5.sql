@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset termofservice:update_db_termofservice-1.0.4-1.0.5.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Add column to termofservice_entry
 --
