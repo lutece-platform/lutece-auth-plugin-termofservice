@@ -12,7 +12,7 @@ id_entry int AUTO_INCREMENT,
 title varchar(255) default '' NOT NULL,
 text long varchar NOT NULL,
 version int,
-published int(1) default '0',
+published int default '0',
 PRIMARY KEY (id_entry)
 );
 

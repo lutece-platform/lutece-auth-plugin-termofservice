@@ -54,6 +54,8 @@ public class EntryJspBeanTest extends LuteceTestCase
 {
     private static final String TEXT1 = "Text1";
     private static final String TEXT2 = "Text2";
+    private static final String TITLE1 = "Title1";
+    private static final String TITLE2 = "Title2";
 	private static final boolean ACCEPTED1 = true;
     private static final boolean ACCEPTED2 = false;
 
@@ -80,7 +82,8 @@ public void testJspBeans(  ) throws AccessDeniedException, IOException
 		adminUser.setAccessCode( "admin" );
 		
         
-        request.addParameter( "text" , TEXT1 );
+		request.addParameter( "title" , TITLE1 );
+		request.addParameter( "text" , TEXT1 );
         request.addParameter( "accepted" , String.valueOf( ACCEPTED1) );
 		request.addParameter("action","createEntry");
         request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "createEntry" ));
@@ -123,7 +126,8 @@ public void testJspBeans(  ) throws AccessDeniedException, IOException
 		adminUser = new AdminUser();
 		adminUser.setAccessCode("admin");
 		
-        request.addParameter( "text" , TEXT2 );
+		request.addParameter( "title" , TITLE2 );
+		request.addParameter( "text" , TEXT2 );
         request.addParameter( "accepted" , String.valueOf( ACCEPTED2) );
 		request.setRequestURI("jsp/admin/plugins/example/ManageEntrys.jsp");
 		//important pour que MVCController sache quelle action effectuer, sinon, il redirigera vers createEntry, qui est l'action par défaut

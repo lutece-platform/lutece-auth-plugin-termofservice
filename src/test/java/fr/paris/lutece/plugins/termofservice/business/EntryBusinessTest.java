@@ -45,6 +45,8 @@ public class EntryBusinessTest extends LuteceTestCase
 {
     private static final String TEXT1 = "Text1";
     private static final String TEXT2 = "Text2";
+    private static final String TITLE1 = "Title1";
+    private static final String TITLE2 = "Title2";
 	private static final boolean ACCEPTED1 = true;
     private static final boolean ACCEPTED2 = false;
 
@@ -55,6 +57,7 @@ public class EntryBusinessTest extends LuteceTestCase
     {
         // Initialize an object
         Entry entry = new Entry();
+        entry.setTitle( TITLE1 );
         entry.setText( TEXT1 );
       
         // Create test
@@ -64,6 +67,7 @@ public class EntryBusinessTest extends LuteceTestCase
         assertEquals( entryStored.getText( ) , entry.getText( ) );
        
         // Update test
+        entry.setTitle( TITLE2 );
         entry.setText( TEXT2 );
       
         EntryHome.update( entry );
