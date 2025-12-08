@@ -7,8 +7,6 @@
     <@tform name='create_entry' action='jsp/admin/plugins/termofservice/ManageEntrys.jsp' >
 
         <@messages errors=errors />
-        <@input type="hidden" id="id" name="id"/>
-        <@input type="hidden" value="${token}" name="token" />
         
 		<@formGroup labelFor='title' labelKey='#i18n{termofservice.modify_entry.labelTitle}' mandatory=true>
 			<@input type='text' id='title' name='title'  value='${entry.title!\'\'}' tabIndex='0' />

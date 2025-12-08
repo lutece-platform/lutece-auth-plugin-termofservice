@@ -33,11 +33,11 @@
  */
 package fr.paris.lutece.plugins.termofservice.business;
 
-import javax.validation.constraints.Size;
-import org.hibernate.validator.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Date;
-import javax.validation.constraints.NotNull;
 /**
  * This is the business class for the object UserAccepted
  */ 

@@ -39,10 +39,14 @@ import fr.paris.lutece.plugins.automaticroleprovider.service.AutomaticRoleConfig
 import fr.paris.lutece.plugins.automaticroleprovider.service.ConfigurationPredicate;
 import fr.paris.lutece.plugins.termofservice.service.TOSService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
+@ApplicationScoped
+@Named( "termofservice.tosPredicate" )
 public class TOSPredicate implements ConfigurationPredicate{
 
-	BiPredicate<LuteceUser,AutomaticRoleConfiguration>  _biPredicate;
+	private BiPredicate<LuteceUser,AutomaticRoleConfiguration>  _biPredicate;
 	
 	public TOSPredicate() {
 		 
