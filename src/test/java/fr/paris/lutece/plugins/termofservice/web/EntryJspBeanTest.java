@@ -33,19 +33,20 @@
  */
 package fr.paris.lutece.plugins.termofservice.web;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockServletConfig;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.admin.AdminAuthenticationService;
 import fr.paris.lutece.portal.service.security.UserNotSignedException;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import fr.paris.lutece.test.LuteceTestCase;
+import fr.paris.lutece.test.mocks.MockHttpServletRequest;
+import fr.paris.lutece.test.mocks.MockHttpServletResponse;
+import jakarta.inject.Inject;
 import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.web.LocalVariables;
-import fr.paris.lutece.plugins.termofservice.business.Entry;
 import fr.paris.lutece.plugins.termofservice.business.EntryHome;
 /**
  * This is the business class test for the object Entry
@@ -54,17 +55,21 @@ public class EntryJspBeanTest extends LuteceTestCase
 {
     private static final String TEXT1 = "Text1";
     private static final String TEXT2 = "Text2";
+    private static final String TITLE1 = "Title1";
+    private static final String TITLE2 = "Title2";
 	private static final boolean ACCEPTED1 = true;
     private static final boolean ACCEPTED2 = false;
 
-public void testJspBeans(  ) throws AccessDeniedException, IOException
+    @Inject
+    private EntryJspBean jspbean;
+    
+    @Test
+    public void testJspBeans(  ) throws AccessDeniedException, IOException
 	{	
      	MockHttpServletRequest request = new MockHttpServletRequest();
 		MockHttpServletResponse response = new MockHttpServletResponse();
-		MockServletConfig config = new MockServletConfig();
 
 		//display admin Entry management JSP
-		EntryJspBean jspbean = new EntryJspBean();
 		String html = jspbean.getManageEntrys( request );
 		assertNotNull(html);
 
@@ -80,6 +85,7 @@ public void testJspBeans(  ) throws AccessDeniedException, IOException
 		adminUser.setAccessCode( "admin" );
 		
         
+		request.addParameter( "title" , TITLE1 );
         request.addParameter( "text" , TEXT1 );
         request.addParameter( "accepted" , String.valueOf( ACCEPTED1) );
 		request.addParameter("action","createEntry");
@@ -112,7 +118,6 @@ public void testJspBeans(  ) throws AccessDeniedException, IOException
 		List<Integer> listIds = EntryHome.getIdEntrysList();
         assertTrue( !listIds.isEmpty( ) );
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
-		jspbean = new EntryJspBean();
 		
 		assertNotNull( jspbean.getModifyEntry( request ) );	
 
@@ -123,6 +128,7 @@ public void testJspBeans(  ) throws AccessDeniedException, IOException
 		adminUser = new AdminUser();
 		adminUser.setAccessCode("admin");
 		
+		request.addParameter( "title" , TITLE2 );
         request.addParameter( "text" , TEXT2 );
         request.addParameter( "accepted" , String.valueOf( ACCEPTED2) );
 		request.setRequestURI("jsp/admin/plugins/example/ManageEntrys.jsp");
@@ -151,7 +157,6 @@ public void testJspBeans(  ) throws AccessDeniedException, IOException
 		request = new MockHttpServletRequest();
         //request.setRequestURI("jsp/admin/plugins/example/ManageEntrys.jsp");
         request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
-		jspbean = new EntryJspBean();
 		request.addParameter("action","confirmRemoveEntry");
 		assertNotNull( jspbean.getModifyEntry( request ) );
 				
