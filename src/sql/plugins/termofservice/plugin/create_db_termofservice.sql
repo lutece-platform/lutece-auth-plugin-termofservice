@@ -23,7 +23,7 @@ guid varchar(255) default '' NOT NULL,
 fk_id_entry int default '0' NOT NULL,
 date_accepted date NOT NULL,
 version int default '0',
-PRIMARY KEY (id_user_accepted),
+PRIMARY KEY (id_user_accepted)
 );
 
 CREATE INDEX guid_idx ON termofservice_user_accepted (guid);
