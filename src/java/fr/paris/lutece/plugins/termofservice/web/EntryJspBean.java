@@ -37,22 +37,30 @@ package fr.paris.lutece.plugins.termofservice.web;
 
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.binding.BindingResult;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.ModelAttribute;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.util.mvc.utils.MVCUtils;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
+import fr.paris.lutece.portal.web.util.IPager;
+import fr.paris.lutece.portal.web.util.Pager;
 import fr.paris.lutece.util.url.UrlItem;
-import fr.paris.lutece.util.html.AbstractPaginator;
 
 import java.util.Comparator;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -63,9 +71,13 @@ import fr.paris.lutece.plugins.termofservice.util.TOSConstants;
 /**
  * This class provides the user interface to manage Entry features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageEntrys.jsp", controllerPath = "jsp/admin/plugins/termofservice/", right = "TERMOFSERVICE_MANAGEMENT" )
-public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
+@RequestScoped
+@Named
+@Controller( controllerJsp = "ManageEntrys.jsp", controllerPath = "jsp/admin/plugins/termofservice/", right = "TERMOFSERVICE_MANAGEMENT", securityTokenEnabled = true )
+public class EntryJspBean extends MVCAdminJspBean
 {
+    private static final long serialVersionUID = 1L;
+
     // Templates
     private static final String TEMPLATE_MANAGE_ENTRYS = "/admin/plugins/termofservice/manage_entrys.html";
     private static final String TEMPLATE_CREATE_ENTRY = "/admin/plugins/termofservice/create_entry.html";
@@ -84,13 +96,9 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     private static final String MARK_ENTRY = "entry";
     private static final String MARK_FEATURE_TOS_PUBLICATION = "featureTOSPublication";
 
-    private static final String JSP_MANAGE_ENTRYS = "jsp/admin/plugins/termofservice/ManageEntrys.jsp";
-
     // Properties
     private static final String MESSAGE_CONFIRM_REMOVE_ENTRY = "termofservice.message.confirmRemoveEntry";
-
-    // Validations
-    private static final String VALIDATION_ATTRIBUTES_PREFIX = "termofservice.model.entity.entry.attribute.";
+    private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "termofservice.listItems.itemsPerPage";
 
     // Views
     private static final String VIEW_MANAGE_ENTRYS = "manageEntrys";
@@ -109,14 +117,16 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     private static final String INFO_ENTRY_UPDATED = "termofservice.info.entry.updated";
     private static final String INFO_ENTRY_REMOVED = "termofservice.info.entry.removed";
     private static final String INFO_ENTRY_PUBLISHED = "termofservice.info.entry.published";
-
     
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
     
-    // Session variable to store working values
+    @Inject
+    @Pager( listBookmark = MARK_ENTRY_LIST, defaultItemsPerPage = PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE)
+    private IPager<Integer, Entry> _pager;
+    @Inject 
+    private Models model;
     private Entry _entry;
-    private List<Integer> _listIdEntrys;
     
     /**
      * Build the Manage View
@@ -126,14 +136,10 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     @View( value = VIEW_MANAGE_ENTRYS, defaultView = true )
     public String getManageEntrys( HttpServletRequest request )
     {
-        _entry = null;
+        List<Integer> _listIdEntrys = EntryHome.getIdEntrysList(  );
+        _pager.withBaseUrl( getHomeUrl( request ) )
+            .withIdList( _listIdEntrys ).populateModels( request, model, ( l ) -> getItemsFromIds( l ), getLocale( ) );
         
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null || _listIdEntrys.isEmpty( ) )
-        {
-        	_listIdEntrys = EntryHome.getIdEntrysList(  );
-        }
-        
-        Map<String, Object> model = getPaginatedListModel( request, MARK_ENTRY_LIST, _listIdEntrys, JSP_MANAGE_ENTRYS );
         model.put( MARK_FEATURE_TOS_PUBLICATION, TOSConstants.PROPERTY_FEATURE_TOS_PUBLICATION_ENABLED );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_ENTRYS, TEMPLATE_MANAGE_ENTRYS, model );
@@ -144,7 +150,6 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */
-	@Override
 	List<Entry> getItemsFromIds( List<Integer> listIds ) 
 	{
 		List<Entry> listEntry = EntryHome.getEntrysListByIds( listIds );
@@ -156,14 +161,6 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
 	}
     
     /**
-    * reset the _listIdEntrys list
-    */
-    public void resetListId( )
-    {
-    	_listIdEntrys = new ArrayList<>( );
-    }
-
-    /**
      * Returns the form to create a entry
      *
      * @param request The Http request
@@ -172,12 +169,9 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     @View( VIEW_CREATE_ENTRY )
     public String getCreateEntry( HttpServletRequest request )
     {
-        _entry = ( _entry != null ) ? _entry : new Entry(  );
+        _entry = ( _entry != null ) ? _entry : new Entry( );
 
-        Map<String, Object> model = getModel(  );
         model.put( MARK_ENTRY, _entry );
-        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_ENTRY ) );
-
         return getPage( PROPERTY_PAGE_TITLE_CREATE_ENTRY, TEMPLATE_CREATE_ENTRY, model );
     }
 
@@ -189,26 +183,18 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
      * @throws AccessDeniedException
      */
     @Action( ACTION_CREATE_ENTRY )
-    public String doCreateEntry( HttpServletRequest request ) throws AccessDeniedException
+    public String doCreateEntry( @Valid @ModelAttribute Entry entry, BindingResult bindingResult, HttpServletRequest request ) throws AccessDeniedException
     {
-        populate( _entry, request, getLocale( ) );
-        
-
-        if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_ENTRY ) )
+        if ( bindingResult.isFailed( ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            model.put( MVCUtils.MARK_ERRORS, bindingResult.getAllErrors( ) );
+            model.put( MARK_ENTRY, entry );
+            return getPage( PROPERTY_PAGE_TITLE_CREATE_ENTRY, TEMPLATE_CREATE_ENTRY, model );
         }
 
-        // Check constraints
-        if ( !validateBean( _entry, VALIDATION_ATTRIBUTES_PREFIX ) )
-        {
-            return redirectView( request, VIEW_CREATE_ENTRY );
-        }
+        EntryHome.create( entry );
 
-        EntryHome.create( _entry );
-        addInfo( INFO_ENTRY_CREATED, getLocale(  ) );
-        resetListId( );
-
+        addInfo( INFO_ENTRY_CREATED, getLocale() );
         return redirectView( request, VIEW_MANAGE_ENTRYS );
     }
 
@@ -219,7 +205,7 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
      * @param request The Http request
      * @return the html code to confirm
      */
-    @Action( ACTION_CONFIRM_REMOVE_ENTRY )
+    @View( value = ACTION_CONFIRM_REMOVE_ENTRY, securityTokenAction = ACTION_REMOVE_ENTRY )
     public String getConfirmRemoveEntry( HttpServletRequest request )
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_ENTRY ) );
@@ -242,10 +228,8 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_ENTRY ) );
         
-        
         EntryHome.remove( nId );
         addInfo( INFO_ENTRY_REMOVED, getLocale(  ) );
-        resetListId( );
 
         return redirectView( request, VIEW_MANAGE_ENTRYS );
     }
@@ -267,11 +251,7 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
             _entry = optEntry.orElseThrow( ( ) -> new AppException(ERROR_RESOURCE_NOT_FOUND ) );
         }
 
-
-        Map<String, Object> model = getModel(  );
         model.put( MARK_ENTRY, _entry );
-        model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_ENTRY ) );
-
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_ENTRY, TEMPLATE_MODIFY_ENTRY, model );
     }
 
@@ -283,29 +263,20 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
      * @throws AccessDeniedException
      */
     @Action( ACTION_MODIFY_ENTRY )
-    public String doModifyEntry( HttpServletRequest request ) throws AccessDeniedException
+    public String doModifyEntry(  @Valid @ModelAttribute Entry entry, BindingResult bindingResult, HttpServletRequest request ) throws AccessDeniedException
     {   
-        populate( _entry, request, getLocale( ) );
-		
-		
-        if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_ENTRY ) )
+        if ( bindingResult.isFailed( ) )
         {
-            throw new AccessDeniedException ( "Invalid security token" );
+            model.put( MVCUtils.MARK_ERRORS, bindingResult.getAllErrors( ) );
+            model.put( MARK_ENTRY, entry );
+            return getPage( PROPERTY_PAGE_TITLE_CREATE_ENTRY, TEMPLATE_CREATE_ENTRY, model );
         }
 
-        // Check constraints
-        if ( !validateBean( _entry, VALIDATION_ATTRIBUTES_PREFIX ) )
-        {
-            return redirect( request, VIEW_MODIFY_ENTRY, PARAMETER_ID_ENTRY, _entry.getId( ) );
-        }
-
-        EntryHome.update( _entry );
+        EntryHome.update( entry );
         addInfo( INFO_ENTRY_UPDATED, getLocale(  ) );
-        resetListId( );
 
         return redirectView( request, VIEW_MANAGE_ENTRYS );
     }
-    
     
     @Action( ACTION_PUBLISH_ENTRY )
     public String doPublishEntry( HttpServletRequest request )
@@ -321,8 +292,8 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
             }
             
             addInfo( INFO_ENTRY_PUBLISHED, getLocale(  ) );
-            resetListId( );
         }
         return redirectView( request, VIEW_MANAGE_ENTRYS );
     }
+
 }

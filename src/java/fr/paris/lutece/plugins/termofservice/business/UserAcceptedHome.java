@@ -41,9 +41,9 @@ import fr.paris.lutece.plugins.termofservice.rs.dto.UserDTO;
 import fr.paris.lutece.plugins.termofservice.service.ClientRS;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.ReferenceList;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.sql.Date;
 import java.util.Calendar;
@@ -56,7 +56,7 @@ import java.util.Optional;
 public final class UserAcceptedHome
 {
     // Static variable pointed at the DAO instance
-    private static IUserAcceptedDAO _dao = SpringContextService.getBean( "termofservice.userAcceptedDAO" );
+    private static IUserAcceptedDAO _dao = CDI.current( ).select( IUserAcceptedDAO.class ).get( );
     private static Plugin _plugin = PluginService.getPlugin( "termofservice" );
     
 

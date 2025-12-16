@@ -33,7 +33,7 @@
  */
 package fr.paris.lutece.plugins.termofservice.business;
 
-import org.hibernate.validator.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 /**
  * This is the business class for the object Entry

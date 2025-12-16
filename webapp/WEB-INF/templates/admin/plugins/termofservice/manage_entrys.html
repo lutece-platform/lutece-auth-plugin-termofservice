@@ -31,7 +31,7 @@
 				<#if featureTOSPublication && !entry.published>
 					<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?action=publishEntry&id=${entry.id}' title='#i18n{termofservice.manage_entrys.buttonPublish}' buttonIcon='eye' />				
 				</#if>
-				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?action=confirmRemoveEntry&id=${entry.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=confirmRemoveEntry&id=${entry.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
 
 	        </td>
         </tr>

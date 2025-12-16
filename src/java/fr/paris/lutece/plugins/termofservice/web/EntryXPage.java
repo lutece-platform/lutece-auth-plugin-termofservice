@@ -37,10 +37,12 @@ package fr.paris.lutece.plugins.termofservice.web;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -63,18 +65,22 @@ import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.portal.web.xpages.XPage; 
 
 
 /**
  * This class provides the user interface to manage Entry xpages ( manage, create, modify, remove )
  */
+@RequestScoped
+@Named( "termofservice.xpage.entry" )
 @Controller( xpageName = "entry" , pageTitleI18nKey = "termofservice.xpage.entry.pageTitle" , pagePathI18nKey = "termofservice.xpage.entry.pagePathLabel" )
 public class EntryXPage extends MVCApplication
 {
-  
-	
-	// Templates
+
+	private static final long serialVersionUID = 1L;
+
+    // Templates
     private static final String TEMPLATE_MANAGE_TOS = "/skin/plugins/termofservice/manage_entrys.html";
     
     // Parameters
@@ -100,9 +106,12 @@ public class EntryXPage extends MVCApplication
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
     
-    // Session variable to store working values
     private Entry _entry;
-    
+    @Inject
+    private Models model;
+    @Inject
+    private AuthorizedUrlService _authorizedUrlService;
+
     /**
      * return the form to manage entrys
      * @param request The Http request
@@ -118,7 +127,6 @@ public class EntryXPage extends MVCApplication
         List<Entry> listEntrys = EntryHome.getEntrysList(  );
         Optional<Entry> currentEntry = TOSService.getCurrentEntry( );
         
-        Map<String, Object> model = getModel(  );
         model.put( MARK_ENTRY_LIST, listEntrys );
         if ( currentEntry.isPresent( ) )
         {
@@ -129,37 +137,35 @@ public class EntryXPage extends MVCApplication
         	model.put( MARK_ENTRY, null );
         }
         
-        
         if( !"see".equals( strMode ))
         {
             //check back url
-            String strBackUrl = AuthorizedUrlService.getInstance().getServiceBackUrl(request );
-            
+            String strBackUrl = _authorizedUrlService.getServiceBackUrl( request );
+
             if ( !StringUtils.isEmpty( strBackUrl ) )
             {
-                model.put ( MARK_BACK_URL, AuthorizedUrlService.getInstance().getServiceBackUrlEncoded(request) );
-            
+                model.put( MARK_BACK_URL, _authorizedUrlService.getServiceBackUrlEncoded( request ) );
+
             }
             model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_TOS ) );
-            
     
             LuteceUser luteceUser = SecurityService.getInstance( ).getRegisteredUser( request );
-            if ( luteceUser == null)
+            if ( luteceUser == null )
             {
-            	throw new UserNotSignedException( );
+                throw new UserNotSignedException( );
             }
             
             Optional<UserAccepted> userAccept = TOSService.getUserAcceptedTOS( luteceUser.getName( ) );
-    		if (userAccept.isPresent( ) )
-    		{
-    			  
-    	        if ( !StringUtils.isEmpty( strBackUrl ) )
-    	        {
-    	            return redirect(request, strBackUrl);
-    	        }
-    			
-        	   return redirect(request, AppPathService.getBaseUrl(request));
-    		}
+            if ( userAccept.isPresent( ) )
+            {
+
+                if ( !StringUtils.isEmpty( strBackUrl ) )
+                {
+                    return redirect( request, strBackUrl );
+                }
+
+                return redirect( request, AppPathService.getBaseUrl( request ) );
+            }
         }
         
         model.put( MARK_MODE, strMode );
@@ -207,21 +213,18 @@ public class EntryXPage extends MVCApplication
 	        userAccepted.setFkIdEntry( nId );
 	        userAccepted.setVersion( _entry.getVersion( ) );
 	        userAccepted.setDateAccepted( new Date( Calendar.getInstance().getTime().getTime() ) );
-	        
-	        
-	        
-	        
+
 	        UserAcceptedHome.create( userAccepted,AppPropertiesService.getPropertyBoolean(Constants.PROPERTY_USED_REMOTE, false) );
 	        addInfo( INFO_ENTRY_UPDATED, getLocale( request ) );
 	        //check back url
-	        String strBackUrl = AuthorizedUrlService.getInstance().getServiceBackUrl(request );
-	        
-	        if ( !StringUtils.isEmpty( strBackUrl ) )
-	        {
-	            return redirect(request, strBackUrl);
-	        }
-	        	
-	        	return redirect(request, AppPathService.getBaseUrl(request));
+            String strBackUrl = _authorizedUrlService.getServiceBackUrl( request );
+
+            if ( !StringUtils.isEmpty( strBackUrl ) )
+            {
+                return redirect( request, strBackUrl );
+            }
+
+            return redirect( request, AppPathService.getBaseUrl( request ) );
         }
         return redirectView( request, VIEW_MANAGE_TOS );
     }

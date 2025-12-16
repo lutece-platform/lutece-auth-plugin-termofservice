@@ -12,7 +12,7 @@ id_entry int AUTO_INCREMENT,
 title varchar(255) default '' NOT NULL,
 text long varchar NOT NULL,
 version int,
-published int(1) default '0',
+published int default '0',
 PRIMARY KEY (id_entry)
 );
 
@@ -23,7 +23,7 @@ guid varchar(255) default '' NOT NULL,
 fk_id_entry int default '0' NOT NULL,
 date_accepted date NOT NULL,
 version int default '0',
-PRIMARY KEY (id_user_accepted),
+PRIMARY KEY (id_user_accepted)
 );
 
 CREATE INDEX guid_idx ON termofservice_user_accepted (guid);
