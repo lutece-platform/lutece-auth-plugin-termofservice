@@ -57,14 +57,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.termofservice.business.Entry;
+import fr.paris.lutece.plugins.termofservice.business.EntryDto;
 import fr.paris.lutece.plugins.termofservice.business.EntryHome;
+import fr.paris.lutece.plugins.termofservice.business.UserAcceptedHome;
 import fr.paris.lutece.plugins.termofservice.util.TOSConstants;
 
 /**
  * This class provides the user interface to manage Entry features ( manage, create, modify, remove )
  */
 @Controller( controllerJsp = "ManageEntrys.jsp", controllerPath = "jsp/admin/plugins/termofservice/", right = "TERMOFSERVICE_MANAGEMENT" )
-public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
+public class EntryJspBean extends AbstractManageTOSJspBean <Integer, EntryDto>
 {
     // Templates
     private static final String TEMPLATE_MANAGE_ENTRYS = "/admin/plugins/termofservice/manage_entrys.html";
@@ -145,14 +147,19 @@ public class EntryJspBean extends AbstractManageTOSJspBean <Integer, Entry>
      * @return the populated list of items corresponding to the id List
      */
 	@Override
-	List<Entry> getItemsFromIds( List<Integer> listIds ) 
+	List<EntryDto> getItemsFromIds( List<Integer> listIds ) 
 	{
 		List<Entry> listEntry = EntryHome.getEntrysListByIds( listIds );
-		
+	
+		//Convert to entryDto
+		List<EntryDto> entryDtoList = listEntry.stream()
+				.map(entry -> new EntryDto(entry, UserAcceptedHome.existsAcceptedEntry(entry.getVersion())))
+				.collect(Collectors.toList());
+
 		// keep original order
-        return listEntry.stream()
-                 .sorted(Comparator.comparingInt( notif -> listIds.indexOf( notif.getId())))
-                 .collect(Collectors.toList());
+		return entryDtoList.stream()
+                .sorted(Comparator.comparingInt( entry -> listIds.indexOf( entry.getId())))
+                .collect(Collectors.toList());
 	}
     
     /**

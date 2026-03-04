@@ -59,7 +59,8 @@ public final class UserAcceptedDAO implements IUserAcceptedDAO
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_user_accepted FROM termofservice_user_accepted";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_user_accepted, guid, fk_id_entry, date_accepted, version FROM termofservice_user_accepted WHERE id_user_accepted IN (  ";
     private static final String SQL_QUERY_SELECT_BY_GUID_ENTRY_VERSION = "SELECT id_user_accepted, guid, fk_id_entry, date_accepted, version FROM termofservice_user_accepted WHERE guid = ? AND fk_id_entry = ? AND version = ? ";
-
+    private static final String SQL_QUERY_ACCEPTED_VERSION_ENTRY = "SELECT 1 FROM termofservice_user_accepted WHERE version = ? LIMIT 1";
+    
     /**
      * {@inheritDoc }
      */
@@ -315,4 +316,14 @@ public final class UserAcceptedDAO implements IUserAcceptedDAO
             return Optional.ofNullable( userAccepted );
         }
     }
+
+	@Override
+	public boolean existsAcceptedVersionEntry(int nVersion, Plugin plugin) {
+		try( DAOUtil daoUtil = new DAOUtil(SQL_QUERY_ACCEPTED_VERSION_ENTRY, plugin) ){
+			daoUtil.setInt(1, nVersion);
+			daoUtil.executeQuery();
+			
+			return daoUtil.next();
+		}
+	}
 }

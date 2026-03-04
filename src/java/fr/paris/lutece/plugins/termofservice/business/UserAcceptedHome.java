@@ -228,5 +228,14 @@ public final class UserAcceptedHome
         return _dao.selectUserAcceptedsListByIds( _plugin, listIds );
     }
 
+	/**
+	 * Checks whether the specified version entry has been accepted at least once.
+	 * @param nVersion
+	 * @return {@code true} if the version entry has already been accepted at least once,
+	 *         {@code false} otherwise
+	 */
+	public static boolean existsAcceptedEntry(int nVersion) {
+		return _dao.existsAcceptedVersionEntry(nVersion, _plugin);
+	}
 }
 

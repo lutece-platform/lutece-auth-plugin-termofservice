@@ -122,4 +122,13 @@ public interface IUserAcceptedDAO
      * @return The list which contains the data of all the avant objects
      */
 	List<UserAccepted> selectUserAcceptedsListByIds( Plugin _plugin, List<Integer> listIds );
+	
+	/**
+	 * Checks whether the specified version entry has been accepted at least once.
+	 * @param nVersion
+	 * @param plugin
+	 * @return {@code true} if the version entry has already been accepted at least once,
+	 *         {@code false} otherwise
+	 */
+	boolean existsAcceptedVersionEntry(int nVersion,Plugin plugin);
 }

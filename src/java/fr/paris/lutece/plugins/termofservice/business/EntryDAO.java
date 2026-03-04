@@ -54,7 +54,7 @@ public final class EntryDAO implements IEntryDAO
     private static final String SQL_QUERY_SELECT_LAST_VERSION = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE version = (select max( version ) from termofservice_entry ) ";
     private static final String SQL_QUERY_INSERT = "INSERT INTO termofservice_entry ( title, text, version, published ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM termofservice_entry WHERE id_entry = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE termofservice_entry SET id_entry = ?, title = ? , text = ?, version = ?, published = ? WHERE id_entry = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE termofservice_entry SET id_entry = ?, title = ? , text = ?, version = ? WHERE id_entry = ?";
     private static final String SQL_QUERY_SELECTALL = "SELECT id_entry, title, text, version, published FROM termofservice_entry";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_entry FROM termofservice_entry";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE id_entry IN (  ";
@@ -140,7 +140,6 @@ public final class EntryDAO implements IEntryDAO
 	        daoUtil.setString( nIndex++ , entry.getTitle( ) );
             daoUtil.setString( nIndex++ , entry.getText( ) );
             daoUtil.setInt( nIndex++ , entry.getVersion( ) );
-            daoUtil.setBoolean( nIndex++ , entry.isPublished( ) );
 	        daoUtil.setInt( nIndex , entry.getId( ) );
 	
 	        daoUtil.executeUpdate( );
