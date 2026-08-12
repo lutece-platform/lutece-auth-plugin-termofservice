@@ -45,7 +45,7 @@
 				</@formGroup>
 				<@formGroup>
 					<@button name='action_modifyEntry' type='submit' tabIndex='2' title='#i18n{termofservice.xpage.entry.labelAccepted}' buttonIcon='plus' />
-					<@button name='view_manageEntrys' type='submit' title='#i18n{portal.util.labelCancel}' buttonIcon='close' color='btn-secondary' cancel=true />
+					<@button id='cancel-tos-button' type='button' title='#i18n{portal.util.labelCancel}' buttonIcon='close' color='btn-secondary' cancel=true />
 				</@formGroup>
 			</#if>
 		</@tform>
@@ -55,6 +55,9 @@
 </#if>
 <script>
 document.addEventListener( "DOMContentLoaded", function(){
-	document.getElementById('tos-main-title' ).textContent = '#i18n{termofservice.manage_entrys.pageTitle}!};
+	document.getElementById('tos-main-title' ).textContent = '#i18n{termofservice.manage_entrys.pageTitle}!}';
+	document.getElementById('cancel-tos-button').onclick = function () {
+		document.getElementById('header-nav-disconnect-button').click();
+	};
 });
 </script>
