@@ -135,7 +135,6 @@ public class UserAcceptedRest
      * @return the UserAccepted if created
      */
     @POST
-    @Path( StringUtils.EMPTY )
     @Produces( MediaType.APPLICATION_JSON )
     public Response createUserAccepted(
     @FormParam( Constants.USERACCEPTED_ATTRIBUTE_GUID ) String guid,
