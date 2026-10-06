@@ -40,8 +40,8 @@
 				${entry.text!''}
 			</@formGroup>
 			<#if !mode?? || mode != 'see'>
-				<@formGroup labelFor='accepted' labelKey='#i18n{termofservice.modify_entry.labelAccepted}' mandatory=true>
-					<@checkBox id="accepted" name="accepted"  value="1" tabIndex='1' mandatory=true />
+				<@formGroup>
+					<@cCheckbox name='accepted' label='#i18n{termofservice.modify_entry.labelAccepted}' required=true id='accepted' value='1' />
 				</@formGroup>
 				<@formGroup>
 					<@button name='action_modifyEntry' type='submit' tabIndex='2' title='#i18n{termofservice.xpage.entry.labelAccepted}' buttonIcon='plus' />
