@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS termofservice_entry;
 CREATE TABLE termofservice_entry (
 id_entry int AUTO_INCREMENT,
 title varchar(255) default '' NOT NULL,
-text long varchar NOT NULL,
+content long varchar NOT NULL,
 version int,
 published int default '0',
 PRIMARY KEY (id_entry)

@@ -53,17 +53,17 @@ import java.util.Optional;
 public final class EntryDAO implements IEntryDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE id_entry = ?";
-    private static final String SQL_QUERY_SELECT_LAST_VERSION = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE version = (select max( version ) from termofservice_entry ) ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO termofservice_entry ( title, text, version, published ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_entry, title, content, version, published FROM termofservice_entry WHERE id_entry = ?";
+    private static final String SQL_QUERY_SELECT_LAST_VERSION = "SELECT id_entry, title, content, version, published FROM termofservice_entry WHERE version = (select max( version ) from termofservice_entry ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO termofservice_entry ( title, content, version, published ) VALUES ( ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM termofservice_entry WHERE id_entry = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE termofservice_entry SET id_entry = ?, title = ? , text = ?, version = ?, published = ? WHERE id_entry = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_entry, title, text, version, published FROM termofservice_entry";
+    private static final String SQL_QUERY_UPDATE = "UPDATE termofservice_entry SET id_entry = ?, title = ? , content = ?, version = ?, published = ? WHERE id_entry = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_entry, title, content, version, published FROM termofservice_entry";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_entry FROM termofservice_entry";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE id_entry IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_entry, title, content, version, published FROM termofservice_entry WHERE id_entry IN (  ";
     private static final String SQL_QUERY_PUBLISH = "UPDATE termofservice_entry SET published = 1 WHERE id_entry = ?";
     private static final String SQL_QUERY_UNPUBLISH_ALL = "UPDATE termofservice_entry SET published = 0";
-    private static final String SQL_QUERY_SELECT_PUBLISHED = "SELECT id_entry, title, text, version, published FROM termofservice_entry WHERE published = 1 ";
+    private static final String SQL_QUERY_SELECT_PUBLISHED = "SELECT id_entry, title, content, version, published FROM termofservice_entry WHERE published = 1 ";
     
     /**
      * {@inheritDoc }
