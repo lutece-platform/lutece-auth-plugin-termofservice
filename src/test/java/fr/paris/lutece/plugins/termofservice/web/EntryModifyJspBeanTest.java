@@ -38,15 +38,18 @@ import org.junit.jupiter.api.Test;
 import fr.paris.lutece.plugins.termofservice.business.Entry;
 import fr.paris.lutece.plugins.termofservice.business.EntryHome;
 import fr.paris.lutece.portal.business.user.AdminUser;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.util.mvc.binding.BindingErrorImpl;
 import fr.paris.lutece.portal.util.mvc.binding.BindingResultImpl;
 import fr.paris.lutece.test.AdminUserUtils;
 import fr.paris.lutece.test.LuteceTestCase;
 import fr.paris.lutece.test.mocks.MockHttpServletRequest;
+import fr.paris.lutece.test.mocks.MockHttpServletResponse;
 import jakarta.inject.Inject;
 
 /**
- * Checks that a modification refused by the validation shows the modification form again, not the creation form.
+ * Checks that a modification refused by the validation shows the modification form again, not the creation form, and that
+ * a modification keeps the publication of the entry.
  */
 public class EntryModifyJspBeanTest extends LuteceTestCase
 {
@@ -79,6 +82,43 @@ public class EntryModifyJspBeanTest extends LuteceTestCase
 
             assertTrue( strHtml != null && strHtml.contains( "action_modifyEntry" ), "The modification form is expected" );
             assertFalse( strHtml.contains( "action_createEntry" ), "The creation form would create another entry" );
+        }
+        finally
+        {
+            EntryHome.remove( entry.getId( ) );
+        }
+    }
+
+    @Test
+    public void testModificationKeepsThePublication( ) throws Exception
+    {
+        Entry entry = new Entry( );
+        entry.setTitle( "published" );
+        entry.setText( "<p>published</p>" );
+        entry.setVersion( 1 );
+        EntryHome.create( entry );
+        EntryHome.unpublishAllEntries( );
+        EntryHome.publishEntry( entry.getId( ) );
+        try
+        {
+            // The modification form has no publication field
+            MockHttpServletRequest request = new MockHttpServletRequest( );
+            request.setMethod( "POST" );
+            request.addParameter( "action", "modifyEntry" );
+            request.addParameter( "id", String.valueOf( entry.getId( ) ) );
+            request.addParameter( "title", "published and modified" );
+            request.addParameter( "text", "<p>modified</p>" );
+            request.addParameter( "version", "2" );
+            request.addParameter( "token", SecurityTokenService.getInstance( ).getToken( request, "modifyEntry" ) );
+            AdminUserUtils.registerAdminUserWithRight( request, new AdminUser( ), RIGHT );
+
+            _instance.processController( request, new MockHttpServletResponse( ) );
+
+            Entry entryStored = EntryHome.findByPrimaryKey( entry.getId( ) ).orElseThrow( );
+            assertEquals( "published and modified", entryStored.getTitle( ) );
+            assertEquals( "<p>modified</p>", entryStored.getText( ) );
+            assertEquals( 2, entryStored.getVersion( ) );
+            assertTrue( entryStored.isPublished( ), "A modification must keep the entry published" );
         }
         finally
         {

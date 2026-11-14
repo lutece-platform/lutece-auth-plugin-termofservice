@@ -272,7 +272,13 @@ public class EntryJspBean extends MVCAdminJspBean
             return getPage( PROPERTY_PAGE_TITLE_MODIFY_ENTRY, TEMPLATE_MODIFY_ENTRY, model );
         }
 
-        EntryHome.update( entry );
+        // The form only holds the title, the text and the version: the publication state stays the stored one
+        Entry entryStored = EntryHome.findByPrimaryKey( entry.getId( ) )
+                .orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+        entryStored.setTitle( entry.getTitle( ) );
+        entryStored.setText( entry.getText( ) );
+        entryStored.setVersion( entry.getVersion( ) );
+        EntryHome.update( entryStored );
         addInfo( INFO_ENTRY_UPDATED, getLocale(  ) );
 
         return redirectView( request, VIEW_MANAGE_ENTRYS );

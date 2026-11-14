@@ -128,6 +128,7 @@ public class EntryJspBeanTest extends LuteceTestCase
 		adminUser = new AdminUser();
 		adminUser.setAccessCode("admin");
 		
+		request.addParameter( "id", String.valueOf( listIds.get( 0 ) ) );
 		request.addParameter( "title" , TITLE2 );
         request.addParameter( "text" , TEXT2 );
         request.addParameter( "accepted" , String.valueOf( ACCEPTED2) );
