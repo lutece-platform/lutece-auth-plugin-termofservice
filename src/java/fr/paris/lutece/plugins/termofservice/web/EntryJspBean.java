@@ -129,11 +129,11 @@ public class EntryJspBean extends MVCAdminJspBean
     private Entry _entry;
     
     /**
-     * Build the Manage View
+     * Build the Manage View. Its forms carry the security token of the publication, posted by the publish button of a row.
      * @param request The HTTP request
      * @return The page
      */
-    @View( value = VIEW_MANAGE_ENTRYS, defaultView = true )
+    @View( value = VIEW_MANAGE_ENTRYS, defaultView = true, securityTokenAction = ACTION_PUBLISH_ENTRY )
     public String getManageEntrys( HttpServletRequest request )
     {
         List<Integer> _listIdEntrys = EntryHome.getIdEntrysList(  );

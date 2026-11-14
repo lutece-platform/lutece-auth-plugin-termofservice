@@ -30,7 +30,11 @@
         	<td>
 				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=modifyEntry&id=${entry.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' params={'aria-label': '#i18n{portal.util.labelModify} ' + entry.title} />
 				<#if featureTOSPublication && !entry.published>
-					<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?action=publishEntry&id=${entry.id}' title='#i18n{termofservice.manage_entrys.buttonPublish}' buttonIcon='eye' params={'aria-label': '#i18n{termofservice.manage_entrys.buttonPublish} ' + entry.title} />				
+					<#-- A POST form: the core adds the security token of the publication (securityTokenAction of the list view) -->
+					<@tform method='post' action='jsp/admin/plugins/termofservice/ManageEntrys.jsp' class='d-inline'>
+						<@input type='hidden' name='id' value='${entry.id}' />
+						<@button type='submit' name='action_publishEntry' title='#i18n{termofservice.manage_entrys.buttonPublish}' buttonIcon='eye' params={'aria-label': '#i18n{termofservice.manage_entrys.buttonPublish} ' + entry.title} />
+					</@tform>
 				</#if>
 				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=confirmRemoveEntry&id=${entry.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger' params={'aria-label': '#i18n{portal.util.labelDelete} ' + entry.title} />
 
