@@ -44,12 +44,10 @@
     <!-- Place plugin resources declaration above (remove if unnecessary) -->
 
     <!-- CSS -->
-    <!--
     <css-stylesheets>
-        <css-stylesheets-scope>xpage|portal</css-stylesheets-scope>
-        <css-stylesheet>...</css-stylesheet>
+        <css-stylesheets-scope>xpage</css-stylesheets-scope>
+        <css-stylesheet>termofservice/termofservice.css</css-stylesheet>
     </css-stylesheets>
-    -->
 
     <!-- BackOffice CSS -->
     <!--
