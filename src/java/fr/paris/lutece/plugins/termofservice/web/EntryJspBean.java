@@ -269,7 +269,7 @@ public class EntryJspBean extends MVCAdminJspBean
         {
             model.put( MVCUtils.MARK_ERRORS, bindingResult.getAllErrors( ) );
             model.put( MARK_ENTRY, entry );
-            return getPage( PROPERTY_PAGE_TITLE_CREATE_ENTRY, TEMPLATE_CREATE_ENTRY, model );
+            return getPage( PROPERTY_PAGE_TITLE_MODIFY_ENTRY, TEMPLATE_MODIFY_ENTRY, model );
         }
 
         EntryHome.update( entry );
