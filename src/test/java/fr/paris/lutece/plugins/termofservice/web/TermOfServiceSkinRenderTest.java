@@ -57,7 +57,8 @@ import freemarker.template.TemplateException;
  * Renders the front office page of the terms of service (skin manage_entrys.html) with HTML auto-escaping (LUT-33153),
  * in its two layouts: the default theme and the theme that provides theme_parisfr_commons.html. The text of the terms
  * is rich text entered by an administrator, written with richText(): its formatting is kept and its scripts removed by
- * the sanitizer of the core, hence the CDI container of LuteceTestCase. The back URL is written as text.
+ * the sanitizer of the core, hence the CDI container of LuteceTestCase. The back URL is written as text. Cancel is a link
+ * to the logout URL of the authentication service, whatever the theme of the site header.
  */
 public class TermOfServiceSkinRenderTest extends LuteceTestCase
 {
@@ -70,6 +71,7 @@ public class TermOfServiceSkinRenderTest extends LuteceTestCase
             + "<#macro boxBody rest...><#nested></#macro><#macro tform rest...><form><#nested></form></#macro>"
             + "<#macro messages rest...></#macro><#macro formGroup rest...><#nested></#macro><#macro checkBox rest...></#macro>"
             + "<#macro button id='' rest...><button id=\"${id}\"></button></#macro>"
+            + "<#macro aButton href id='' rest...><a id=\"${id}\" href=\"${href}\"></a></#macro>"
             + "<#macro input name value='' rest...><input name=\"${name}\" value=\"${value}\"></#macro>"
             + "<#macro cContainer rest...><#nested></#macro><#macro cRow rest...><#nested></#macro><#macro cCol rest...><#nested></#macro>"
             + "<#macro cTitle rest...><#nested></#macro><#macro cSection class='' rest...><section class=\"${class}\"><#nested></section></#macro>"
@@ -82,6 +84,7 @@ public class TermOfServiceSkinRenderTest extends LuteceTestCase
     private static final String HOSTILE = "<script>alert(1)</script><p onclick=\"alert(2)\">Contact</p>";
     private static final String TEXT = TITLE + LIST + STYLED + HOSTILE;
     private static final String BACK_URL = "https://example.org/demarche?a=1&b=\"x\"<y>";
+    private static final String LOGOUT_URL = "jsp/site/plugins/mylutece/DoMyLuteceLogout.jsp";
     private static final String BACK_URL_ESCAPED = "value=\"https://example.org/demarche?a=1&amp;b=&quot;x&quot;&lt;y&gt;\"";
 
     /**
@@ -126,6 +129,24 @@ public class TermOfServiceSkinRenderTest extends LuteceTestCase
      */
     private static String render( boolean bThemeParisFr ) throws IOException, TemplateException
     {
+        return render( bThemeParisFr, LOGOUT_URL );
+    }
+
+    /**
+     * Renders the page for an entry, a back URL and a logout URL.
+     *
+     * @param bThemeParisFr
+     *            true for the layout of theme_parisfr_commons.html
+     * @param strLogoutUrl
+     *            the logout URL of the authentication service, or null
+     * @return the rendering
+     * @throws IOException
+     *             if the template cannot be read
+     * @throws TemplateException
+     *             if the rendering fails
+     */
+    private static String render( boolean bThemeParisFr, String strLogoutUrl ) throws IOException, TemplateException
+    {
         Entry entry = new Entry( );
         entry.setId( 1 );
         entry.setTitle( "CGU" );
@@ -136,6 +157,10 @@ public class TermOfServiceSkinRenderTest extends LuteceTestCase
         model.put( "back_url", BACK_URL );
         model.put( "token", "token" );
         model.put( "errors", new ArrayList<>( ) );
+        if ( strLogoutUrl != null )
+        {
+            model.put( "logout_url", strLogoutUrl );
+        }
 
         StringWriter writer = new StringWriter( );
         configuration( bThemeParisFr ).getTemplate( TEMPLATE_PAGE ).process( model, writer );
@@ -189,5 +214,33 @@ public class TermOfServiceSkinRenderTest extends LuteceTestCase
 
         assertTextKeptAndBackUrlEscaped( strHtml );
         assertTrue( strHtml.contains( "class=\"py-3 overflow-auto termofservice-text\"" ), strHtml );
+    }
+
+    /**
+     * Cancel of the default layout is a link to the logout URL, not a script that looks for a button of the site header.
+     *
+     * @throws Exception
+     *             if the rendering fails
+     */
+    @Test
+    public void testCancelIsALinkToTheLogoutUrl( ) throws Exception
+    {
+        String strHtml = render( false );
+
+        assertTrue( strHtml.contains( "<a id=\"cancel-tos-button\" href=\"" + LOGOUT_URL + "\">" ), strHtml );
+        assertFalse( strHtml.contains( "main-nav-user-disconnect-button" ), strHtml );
+        assertFalse( strHtml.contains( "<script" ), strHtml );
+    }
+
+    /**
+     * Without a logout URL, the default layout shows no Cancel.
+     *
+     * @throws Exception
+     *             if the rendering fails
+     */
+    @Test
+    public void testNoCancelWithoutLogoutUrl( ) throws Exception
+    {
+        assertFalse( render( false, null ).contains( "cancel-tos-button" ) );
     }
 }

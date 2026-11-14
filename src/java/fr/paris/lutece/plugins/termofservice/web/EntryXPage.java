@@ -93,6 +93,7 @@ public class EntryXPage extends MVCApplication
     private static final String MARK_ENTRY = "entry";
     private static final String MARK_BACK_URL = "back_url";
     private static final String MARK_MODE = "mode";
+    private static final String MARK_LOGOUT_URL = "logout_url";
     
     // Views
     private static final String VIEW_MANAGE_TOS = "manageEntrys";
@@ -155,6 +156,9 @@ public class EntryXPage extends MVCApplication
                 throw new UserNotSignedException( );
             }
             
+            // Cancel logs the user out through the logout URL of the authentication service
+            model.put( MARK_LOGOUT_URL, SecurityService.getInstance( ).getDoLogoutUrl( ) );
+
             Optional<UserAccepted> userAccept = TOSService.getUserAcceptedTOS( luteceUser.getName( ) );
             if ( userAccept.isPresent( ) )
             {
