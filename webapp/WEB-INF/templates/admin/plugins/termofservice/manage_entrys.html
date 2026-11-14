@@ -1,8 +1,9 @@
 <#include "managetos_tabs.html" />
+<@pageHeader title='#i18n{termofservice.manage_entrys.pageTitle}' />
 <@tabs2 tab="entry" />
 
 <@box>
-	<@boxHeader title='#i18n{termofservice.manage_entry.title}' boxTools=true>
+	<@boxHeader title='#i18n{termofservice.manage_entrys.title}' boxTools=true>
 		<@tform class='form-inline pull-right' name='manage_entry' action='jsp/admin/plugins/termofservice/ManageEntrys.jsp'>
 			<@button type='submit' name='view_createEntry' buttonIcon='plus' title='#i18n{termofservice.manage_entrys.buttonAdd}' />
 		</@tform>
@@ -13,9 +14,9 @@
     <div class="clearfix"></div>
     <@table>
         <tr>
-            <th>#i18n{termofservice.manage_entrys.columnTitle}</th>
-            <th>#i18n{termofservice.manage_entrys.columnVersion}</th>
-            <th>#i18n{portal.util.labelActions}</th>
+            <th scope="col">#i18n{termofservice.manage_entrys.columnTitle}</th>
+            <th scope="col">#i18n{termofservice.manage_entrys.columnVersion}</th>
+            <th scope="col">#i18n{portal.util.labelActions}</th>
         </tr>
         <@tableHeadBodySeparator />
         <#list entry_list as entry >
@@ -27,11 +28,11 @@
 				${entry.version}
 			</td>
         	<td>
-				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=modifyEntry&id=${entry.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=modifyEntry&id=${entry.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' params={'aria-label': '#i18n{portal.util.labelModify} ' + entry.title} />
 				<#if featureTOSPublication && !entry.published>
-					<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?action=publishEntry&id=${entry.id}' title='#i18n{termofservice.manage_entrys.buttonPublish}' buttonIcon='eye' />				
+					<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?action=publishEntry&id=${entry.id}' title='#i18n{termofservice.manage_entrys.buttonPublish}' buttonIcon='eye' params={'aria-label': '#i18n{termofservice.manage_entrys.buttonPublish} ' + entry.title} />				
 				</#if>
-				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=confirmRemoveEntry&id=${entry.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+				<@aButton href='jsp/admin/plugins/termofservice/ManageEntrys.jsp?view=confirmRemoveEntry&id=${entry.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger' params={'aria-label': '#i18n{portal.util.labelDelete} ' + entry.title} />
 
 	        </td>
         </tr>

@@ -5,7 +5,7 @@
 	<@cRow class='mt-sm-5 pt-sm-5'>
 		<@cCol class='mt-5'>
 			<@cTitle id='tos-main-title' class='py-3 main-info-color'>#i18n{termofservice.xpage.entry.pageTitle}</@cTitle>
-			<@cSection class='py-3 overflow-auto termofservice-text'>${richText(entry.text!'')}</@cSection>
+			<@cSection class='py-3 overflow-auto termofservice-text' params={'tabindex': '0', 'aria-labelledby': 'tos-main-title'}>${richText(entry.text!'')}</@cSection>
 			<#if !mode?? || mode != 'see'>
 				<@cForm action='jsp/site/Portal.jsp' >
 					<@messages errors=errors />
@@ -18,7 +18,7 @@
 					</@cFormRow>
 					<@cFormRow class='mb-5'>
 						<@cCol>
-						    <@cBtn label='Continuer' class='primary' params={"name": "action_modifyEntry"} />
+						    <@cBtn label='#i18n{termofservice.xpage.entry.buttonContinue}' class='primary' params={"name": "action_modifyEntry"} />
 						</@cCol>
 					</@cFormRow>
 				</@cForm>
@@ -28,7 +28,7 @@
 </@cContainer>
 <#else>
 <@box>
-	<@boxHeader title='#i18n{termofservice.xpage.entry.pageTitle}' id='tos-main-title' />
+	<@boxHeader title='#i18n{termofservice.xpage.entry.pageTitle}' titleLevel='h1' titleParams={'id': 'tos-main-title'} />
 	<@boxBody>
 		<@tform class='form-horizontal' action='jsp/site/Portal.jsp' >
 			<@messages errors=errors />
@@ -36,9 +36,9 @@
 			<@input type="hidden" value="${token!}" name="token" />
 			<@input type="hidden" name="page" value="entry" /> 
 			<#if back_url??><@input type='hidden' name='back_url' value=back_url /></#if>
-			<@formGroup labelFor='text' labelKey='#i18n{termofservice.xpage.entry.pageTitle}' mandatory=true>
+			<div class="mb-3">
 				${richText(entry.text!'')}
-			</@formGroup>
+			</div>
 			<#if !mode?? || mode != 'see'>
 				<@formGroup labelFor='accepted' labelKey='#i18n{termofservice.modify_entry.labelAccepted}' mandatory=true>
 					<@checkBox id="accepted" name="accepted"  value="1" tabIndex='1' mandatory=true />
