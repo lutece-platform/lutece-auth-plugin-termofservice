@@ -41,7 +41,10 @@ import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.util.AppException;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.binding.BindingError;
+import fr.paris.lutece.portal.util.mvc.binding.BindingErrorImpl;
 import fr.paris.lutece.portal.util.mvc.binding.BindingResult;
+import fr.paris.lutece.portal.util.mvc.binding.ParamError;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.ModelAttribute;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
@@ -52,8 +55,10 @@ import fr.paris.lutece.portal.web.util.Pager;
 import fr.paris.lutece.util.url.UrlItem;
 
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
@@ -80,6 +85,8 @@ public class EntryJspBean extends MVCAdminJspBean
 
     // Templates
     private static final String TEMPLATE_MANAGE_ENTRYS = "/admin/plugins/termofservice/manage_entrys.html";
+    private static final String PARAMETER_VERSION = "version";
+    private static final String MESSAGE_VERSION_NOT_NUMBER = "#i18n{termofservice.validation.entry.Version.notNumber}";
     private static final String TEMPLATE_CREATE_ENTRY = "/admin/plugins/termofservice/create_entry.html";
     private static final String TEMPLATE_MODIFY_ENTRY = "/admin/plugins/termofservice/modify_entry.html";
 
@@ -187,7 +194,7 @@ public class EntryJspBean extends MVCAdminJspBean
     {
         if ( bindingResult.isFailed( ) )
         {
-            model.put( MVCUtils.MARK_ERRORS, bindingResult.getAllErrors( ) );
+            model.put( MVCUtils.MARK_ERRORS, getErrors( bindingResult ) );
             model.put( MARK_ENTRY, entry );
             return getPage( PROPERTY_PAGE_TITLE_CREATE_ENTRY, TEMPLATE_CREATE_ENTRY, model );
         }
@@ -267,7 +274,7 @@ public class EntryJspBean extends MVCAdminJspBean
     {   
         if ( bindingResult.isFailed( ) )
         {
-            model.put( MVCUtils.MARK_ERRORS, bindingResult.getAllErrors( ) );
+            model.put( MVCUtils.MARK_ERRORS, getErrors( bindingResult ) );
             model.put( MARK_ENTRY, entry );
             return getPage( PROPERTY_PAGE_TITLE_MODIFY_ENTRY, TEMPLATE_MODIFY_ENTRY, model );
         }
@@ -302,4 +309,20 @@ public class EntryJspBean extends MVCAdminJspBean
         return redirectView( request, VIEW_MANAGE_ENTRYS );
     }
 
+
+    /**
+     * Gives the errors of a form to display: the version is a whole number, its conversion error is replaced by a readable message
+     *
+     * @param bindingResult
+     *            the binding result
+     * @return the errors
+     */
+    private Set<ParamError> getErrors( BindingResult bindingResult )
+    {
+        return bindingResult.getAllErrors( ).stream( )
+                .map( error -> ( error instanceof BindingError bindingError ) && PARAMETER_VERSION.equals( error.getParamName( ) )
+                        ? new BindingErrorImpl( PARAMETER_VERSION, MESSAGE_VERSION_NOT_NUMBER, bindingError.getSubmittedValue( ) )
+                        : error )
+                .collect( Collectors.toCollection( LinkedHashSet::new ) );
+    }
 }

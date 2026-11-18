@@ -125,4 +125,23 @@ public class EntryModifyJspBeanTest extends LuteceTestCase
             EntryHome.remove( entry.getId( ) );
         }
     }
+
+    @Test
+    public void testVersionNotANumberGivesAReadableMessage( ) throws Exception
+    {
+        // The conversion error the binder gives for the version "1.0"
+        BindingResultImpl bindingResult = new BindingResultImpl( );
+        bindingResult.addBindingError( new BindingErrorImpl( "version", "Error converting from 'String' to 'Integer' For input string: \"1.0\"", "1.0" ) );
+        Entry entryPosted = new Entry( );
+        entryPosted.setTitle( "version" );
+        entryPosted.setText( "<p>version</p>" );
+        MockHttpServletRequest request = new MockHttpServletRequest( );
+        AdminUserUtils.registerAdminUserWithRight( request, new AdminUser( ), RIGHT );
+
+        String strHtml = _instance.doCreateEntry( entryPosted, bindingResult, request );
+
+        assertFalse( strHtml.contains( "Error converting" ), strHtml );
+        // The message key, localized with the admin page
+        assertTrue( strHtml.contains( "termofservice.validation.entry.Version.notNumber" ) || strHtml.contains( "whole number" ), strHtml );
+    }
 }
