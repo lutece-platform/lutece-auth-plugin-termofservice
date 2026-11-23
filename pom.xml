@@ -12,7 +12,7 @@
     <artifactId>plugin-termofservice</artifactId>
     <packaging>lutece-plugin</packaging>
     
-    <version>1.0.8-beta-01</version>
+    <version>1.0.8</version>
     <name>Lutece termofservice plugin</name>
 
     <repositories>
